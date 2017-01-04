@@ -1,0 +1,9 @@
+{
+  "name": "epub-builder",
+  "dependencies": {
+    "archiver": "registry:dt/archiver#0.15.0+20161124045926"
+  },
+  "globalDependencies": {
+    "node": "registry:dt/node#6.0.0+20161229171858"
+  }
+}

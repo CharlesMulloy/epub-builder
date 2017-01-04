@@ -1,0 +1,16 @@
+{
+  "name": "epub-builder",
+  "version": "1.0.0",
+  "description": "A module for creating epub files quickly and efficiently.",
+  "main": "dist/index.js",
+  "dependencies": {
+    "archiver": "^1.3.0",
+    "string-builder": "^0.1.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
