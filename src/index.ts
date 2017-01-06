@@ -2,12 +2,18 @@ import * as archiver from 'archiver';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as StringBuilder from 'string-builder';
-import * as helper from './lib/lib';
+import * as mime from 'mime';
+
+//import * as helper from './lib/lib';
+import {buildChapter} from './lib/lib';
+import {Asset} from './lib/asset';
 
 var title = '';
 var author = '';
 var summary = '';
 var bookChapters = [];
+var assets = [];
+var coverImage = null;
 
 var date = new Date();
 var currentDate = date.getTime();
@@ -43,11 +49,20 @@ export function addChapter(title: string, content: string) {
     });
 }
 
-export function getChapter(chapter = -1) {
+export function getChapter(chapter = -1): any {
     if (chapter === -1)
         return bookChapters;
     else
         return bookChapters[chapter];
+}
+
+export function addCoverImage(target: string): void {
+    coverImage = new Asset(target);
+    assets.push(coverImage);
+}
+
+export function addAsset(target: string): void{
+    assets.push(new Asset(target));
 }
 
 export function createBook(out: string) {
@@ -84,8 +99,15 @@ export function createBook(out: string) {
 
     //Create Chapters
     for (var i = 0; i < bookChapters.length; i++) {
-        archive.append(helper.buildChapter(bookChapters[i].title, bookChapters[i].content), {
+        archive.append(buildChapter(bookChapters[i].title, bookChapters[i].content), {
             name: `OEBPS/Chapter${i}.html`
+        });
+    }
+
+    //Add assets
+    for (var asset of assets) {
+        archive.append(fs.createReadStream(asset.path), {
+            name: `OEBPS/${asset.fileName}`
         });
     }
 
@@ -104,6 +126,11 @@ function createOPF(): string {
     sb.append(`<dc:description>${summary}</dc:description>`);
     sb.append("<dc:language>en</dc:language>");
     sb.append("<dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + currentDate + "</dc:identifier>");
+
+    //Add cover image if it is specified.
+    if (coverImage !== null) {
+        sb.append(`<meta name="cover" content="cover_image"/>`);
+    }
     sb.append("</metadata>");
 
     //Begin manifest
@@ -112,6 +139,9 @@ function createOPF(): string {
     for (var i = 0; i < bookChapters.length; i++) {
         sb.append("<item id=\"Chapter" + i + "\" href=\"Chapter" + i + ".html\" media-type=\"application/xhtml+xml\"/>");
     }
+    if (coverImage !== null) {
+        sb.append(`<item id="cover_image" href="${coverImage.fileName}" media-type="${coverImage.mimetype}"/>`);
+    }
     sb.append("</manifest>");
 
     //Begin Spine
@@ -119,7 +149,6 @@ function createOPF(): string {
     for (var i = 0; i < bookChapters.length; i++) {
         sb.append("<itemref idref=\"Chapter" + i + "\" />");
     }
-
     sb.append("</spine></package>");
 
     return sb.toString();
