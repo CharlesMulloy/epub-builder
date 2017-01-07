@@ -7,6 +7,7 @@ import * as mime from 'mime';
 //import * as helper from './lib/lib';
 import {buildChapter} from './lib/lib';
 import {Asset} from './lib/asset';
+import {Chapter} from './lib/chapter';
 
 var title = '';
 var author = '';
@@ -43,10 +44,7 @@ export function getSummary(): string {
 }
 
 export function addChapter(title: string, content: string) {
-    bookChapters.push({
-        title,
-        content
-    });
+    bookChapters.push(new Chapter(title, content));
 }
 
 export function getChapter(chapter = -1): any {

@@ -21,7 +21,10 @@ To create a book you only need to follow this simple formula.
 
 Version history
 ---------------
-1.0.0
+1.1.1
+- Cleaned up code.
+
+1.1.0
 - Allows setting of cover image.
 - Allows adding assets to the book.
 
