@@ -1,7 +1,7 @@
 Epub-Generator
 ==============
 
-This library is designed to factilitate the creation of EPUB files as easily as possible. It is very basic and simple, so the features are limited, but it is also very quick and easy to understand.
+This library is designed to facilitate the creation of EPUB files as easily as possible. It is very basic and simple, so the features are limited, but it is also very quick and easy to understand.
 
 To create a book you only need to follow this simple formula.
 

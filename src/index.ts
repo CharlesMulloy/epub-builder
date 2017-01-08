@@ -3,8 +3,6 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as StringBuilder from 'string-builder';
 import * as mime from 'mime';
-
-//import * as helper from './lib/lib';
 import {buildChapter} from './lib/lib';
 import {Asset} from './lib/asset';
 import {Chapter} from './lib/chapter';
