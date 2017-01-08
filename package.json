@@ -1,6 +1,6 @@
 {
     "name": "epub-builder",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "description": "A module for creating epub files quickly and efficiently.",
     "main": "dist/index.js",
     "repository": {
