@@ -5,7 +5,7 @@ This library is designed to facilitate the creation of EPUB files as easily as p
 
 To create a book you only need to follow this simple formula.
 
-        var book = require("./index");
+        var book = require("epub-builder");
         book.setTitle("This is a title");
         book.setAuthor("This is the author");
         book.setSummary("This is the summary");
