@@ -10,6 +10,7 @@ import {Chapter} from './lib/chapter';
 var title = '';
 var author = '';
 var summary = '';
+var uuid = '';
 var bookChapters = [];
 var assets = [];
 var coverImage = null;
@@ -39,6 +40,10 @@ export function setSummary(summaryIn: string) {
 
 export function getSummary(): string {
     return summary;
+}
+
+export function setUUID(uuidIn: string) {
+    uuid = uuidIn;
 }
 
 export function addChapter(title: string, content: string) {
@@ -121,7 +126,13 @@ function createOPF(): string {
     sb.append(`<dc:creator>${author}</dc:creator>`);
     sb.append(`<dc:description>${summary}</dc:description>`);
     sb.append("<dc:language>en</dc:language>");
-    sb.append("<dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + currentDate + "</dc:identifier>");
+
+    //Generates UUID if the user did not set one.
+    if(uuid.length < 1 )
+        sb.append("<dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + currentDate + "</dc:identifier>");
+    //Uses the user's SSID if set.
+    else
+        sb.append("<dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + uuid + "</dc:identifier>");
 
     //Add cover image if it is specified.
     if (coverImage !== null) {

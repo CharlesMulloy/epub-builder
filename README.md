@@ -9,6 +9,8 @@ To create a book you only need to follow this simple formula.
         book.setTitle("This is a title");
         book.setAuthor("This is the author");
         book.setSummary("This is the summary");
+        //Used to set the UUID of the book. Defaults to the current date according to the system's calendar if not set.
+        book.setUUID("1234567890");
         //Repeat the following for each chapter you with to add.
         book.addChapter("Chapter Title", "Chapter Content");
         //Used to add a cover image to the book.

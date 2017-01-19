@@ -21,5 +21,6 @@ var testChapters = [{
 for (var i = 0; i < testChapters.length; i++) {
     book.addChapter(testChapters[i].title, testChapters[i].content);
 }
+//book.setUUID("testUUID");
 
 book.createBook("TestBook");
