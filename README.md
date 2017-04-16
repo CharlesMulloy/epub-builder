@@ -23,7 +23,10 @@ To create a book you only need to follow this simple formula.
 
 Version history
 ---------------
-1.3.2
+1.2.5
+- Fixed version typo in README.md
+
+1.2.4
 - Cleaned up code.
 
 1.1.1
