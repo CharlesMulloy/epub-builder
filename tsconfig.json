@@ -4,5 +4,6 @@
         "outDir": "dist",
         "moduleResolution": "node"
     },
+    "compileOnSave": true,
     "include": ["src/**/*"]
 }

@@ -119,9 +119,9 @@ export function createBook(out: string) {
 function createOPF(): string {
     var sb = new StringBuilder();
 
-    sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-    sb.append("<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookID\" version=\"2.0\">");
-    sb.append("<metadata xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:opf=\"http://www.idpf.org/2007/opf\">");
+    sb.append(`<?xml version="1.0" encoding="UTF-8"?>`);
+    sb.append(`<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookID" version="2.0">`);
+    sb.append(`<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">`);
     sb.append(`<dc:title>${title}</dc:title>`);
     sb.append(`<dc:creator>${author}</dc:creator>`);
     sb.append(`<dc:description>${summary}</dc:description>`);
@@ -129,59 +129,59 @@ function createOPF(): string {
 
     //Generates UUID if the user did not set one.
     if(uuid.length < 1 )
-        sb.append("<dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + currentDate + "</dc:identifier>");
+        sb.append(`<dc:identifier id="BookID" opf:scheme="UUID">${currentDate}</dc:identifier>`);
     //Uses the user's SSID if set.
     else
-        sb.append("<dc:identifier id=\"BookID\" opf:scheme=\"UUID\">" + uuid + "</dc:identifier>");
+        sb.append(`<dc:identifier id="BookID" opf:scheme="UUID"> ${uuid} </dc:identifier>`);
 
     //Add cover image if it is specified.
     if (coverImage !== null) {
         sb.append(`<meta name="cover" content="cover_image"/>`);
     }
-    sb.append("</metadata>");
+    sb.append(`</metadata>`);
 
     //Begin manifest
-    sb.append("<manifest>");
-    sb.append("<item id=\"ncx\" href=\"toc.ncx\" media-type=\"application/x-dtbncx+xml\" />");
+    sb.append(`<manifest>`);
+    sb.append(`<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />`);
     for (var i = 0; i < bookChapters.length; i++) {
-        sb.append("<item id=\"Chapter" + i + "\" href=\"Chapter" + i + ".html\" media-type=\"application/xhtml+xml\"/>");
+        sb.append(`<item id="Chapter${i}" href="Chapter${i}.html" media-type="application/xhtml+xml"/>`);
     }
     if (coverImage !== null) {
         sb.append(`<item id="cover_image" href="${coverImage.fileName}" media-type="${coverImage.mimetype}"/>`);
     }
-    sb.append("</manifest>");
+    sb.append(`</manifest>`);
 
     //Begin Spine
-    sb.append("<spine toc=\"ncx\">");
+    sb.append(`<spine toc="ncx">`);
     for (var i = 0; i < bookChapters.length; i++) {
-        sb.append("<itemref idref=\"Chapter" + i + "\" />");
+        sb.append(`<itemref idref="Chapter${i}"/>`);
     }
-    sb.append("</spine></package>");
+    sb.append(`</spine></package>`);
 
     return sb.toString();
 }
 
 function createTOC(): string {
     var sb = new StringBuilder();
-    sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-    sb.append("<ncx xmlns=\"http://www.daisy.org/z3986/2005/ncx/\" version=\"2005-1\">");
-    sb.append("<head>");
-    sb.append("<meta name=\"dtb:uid\" content=\"" + currentDate + "\"/>");
-    sb.append("</head>");
-    sb.append("<docTitle>");
-    sb.append("<text>" + title + "</text>");
-    sb.append("</docTitle>");
-    sb.append("<navMap>");
+    sb.append(`<?xml version="1.0" encoding="UTF-8"?>`);
+    sb.append(`<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">`);
+    sb.append(`<head>`);
+    sb.append(`<meta name="dtb:uid" content="${currentDate}"/>`);
+    sb.append(`</head>`);
+    sb.append(`<docTitle>`);
+    sb.append(`<text>${title}</text>`);
+    sb.append(`</docTitle>`);
+    sb.append(`<navMap>`);
 
     for (var i = 1; i <= bookChapters.length; i++) {
-        sb.append("<navPoint id=\"Chapter" + (i - 1) + ".html\" playOrder=\"" + i + "\">");
-        sb.append("<navLabel>");
-        sb.append("<text>" + bookChapters[i - 1].title + "</text>");
-        sb.append("</navLabel>");
-        sb.append("<content src=\"Chapter" + (i - 1) + ".html\" />");
-        sb.append("</navPoint>");
+        sb.append(`<navPoint id="Chapter${i - 1}.html" playOrder="${i}">`);
+        sb.append(`<navLabel>`);
+        sb.append(`<text>${bookChapters[i - 1].title}</text>`);
+        sb.append(`</navLabel>`);
+        sb.append(`<content src="Chapter${(i - 1)}.html" />`);
+        sb.append(`</navPoint>`);
     }
-    sb.append("</navMap></ncx>");
+    sb.append(`</navMap></ncx>`);
 
     return sb.toString();
 }

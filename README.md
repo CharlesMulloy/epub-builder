@@ -1,4 +1,4 @@
-Epub-Generator
+Epub-Builder
 ==============
 
 This library is designed to facilitate the creation of EPUB files as easily as possible. It is very basic and simple, so the features are limited, but it is also very quick and easy to understand.
@@ -23,7 +23,11 @@ To create a book you only need to follow this simple formula.
 
 Version history
 ---------------
+1.3.2
+- Cleaned up code.
+
 1.1.1
+- Allows manual setting of UUID.
 - Cleaned up code.
 
 1.1.0
@@ -34,5 +38,5 @@ Version history
 
 Todo list
 ---------
-- Allow manual setting of UUID.
+- Will deprecate createBook() and replace with another method so that the output filename can have any extension desired. File will still be an Epub file though.
 - Set to automatically prettify text.
