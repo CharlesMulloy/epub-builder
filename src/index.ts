@@ -12,7 +12,7 @@ var author = '';
 var summary = '';
 var uuid = '';
 var bookChapters = [];
-var assets = [];
+var assets : Asset[] = [];
 var coverImage = null;
 
 var date = new Date();
@@ -148,6 +148,10 @@ function createOPF(): string {
     }
     if (coverImage !== null) {
         sb.append(`<item id="cover_image" href="${coverImage.fileName}" media-type="${coverImage.mimetype}"/>`);
+    }
+    for (let i = 0; i < assets.length; i++) {
+        const item = assets[i];
+        sb.append(`<item id="${item.idPrefix}-${i}" href="${item.fileName}" media-type="${item.mimetype}"/>`);
     }
     sb.append(`</manifest>`);
 

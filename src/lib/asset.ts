@@ -14,4 +14,12 @@ export class Asset {
     this.mimetype = lookup(target);
     this.fileName = basename(target);
   }
+
+  get idPrefix() : string {
+    const idx = this.mimetype.indexOf('/');
+    if (idx >= 0) {
+      return this.mimetype.substr(0, idx);
+    }
+    return this.mimetype;
+  }
 }
