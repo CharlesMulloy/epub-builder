@@ -14,7 +14,7 @@ export class EpubBuilder {
     private _uuid: string = '';
     private _bookChapters = [];
     private _assets: Asset[] = [];
-    private _coverImage = null;
+    private _coverImage: Asset = null;
     private _currentDate = new Date().getTime();
 
     get title() : string {
@@ -116,6 +116,13 @@ export class EpubBuilder {
     }
 
     private createOPF(): string {
+        const item2IdMap = {};
+        for (let i = 0; i < this._assets.length; i++) {
+            const item = this._assets[i];
+            const id = `${item.idPrefix}-${i}`;
+            item2IdMap[item.fileName] = id;
+        }
+
         var sb = new StringBuilder();
 
         sb.append(`<?xml version="1.0" encoding="UTF-8"?>`);
@@ -135,7 +142,7 @@ export class EpubBuilder {
 
         //Add cover image if it is specified.
         if (this._coverImage !== null) {
-            sb.append(`<meta name="cover" content="cover_image"/>`);
+            sb.append(`<meta name="cover" content="${item2IdMap[this._coverImage.fileName]}"/>`);
         }
         sb.append(`</metadata>`);
 
@@ -145,12 +152,9 @@ export class EpubBuilder {
         for (var i = 0; i < this._bookChapters.length; i++) {
             sb.append(`<item id="Chapter${i}" href="Chapter${i}.html" media-type="application/xhtml+xml"/>`);
         }
-        if (this._coverImage !== null) {
-            sb.append(`<item id="cover_image" href="${this._coverImage.fileName}" media-type="${this._coverImage.mimetype}"/>`);
-        }
         for (let i = 0; i < this._assets.length; i++) {
             const item = this._assets[i];
-            sb.append(`<item id="${item.idPrefix}-${i}" href="${item.fileName}" media-type="${item.mimetype}"/>`);
+            sb.append(`<item id="${item2IdMap[item.fileName]}" href="${item.fileName}" media-type="${item.mimetype}"/>`);
         }
         sb.append(`</manifest>`);
 
