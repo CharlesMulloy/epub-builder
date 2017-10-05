@@ -138,7 +138,11 @@ export class EpubBuilder {
             sb.append(`<dc:identifier id="BookID" opf:scheme="UUID">${this._currentDate}</dc:identifier>`);
         //Uses the user's SSID if set.
         else
-            sb.append(`<dc:identifier id="BookID" opf:scheme="UUID"> ${this._uuid} </dc:identifier>`);
+            sb.append(`<dc:identifier id="BookID" opf:scheme="UUID">${this._uuid}</dc:identifier>`);
+
+        const now = new Date();
+        const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+        sb.append(`<meta property="dcterms:modified">${utc.toISOString()}</meta>`);
 
         //Add cover image if it is specified.
         if (this._coverImage !== null) {
