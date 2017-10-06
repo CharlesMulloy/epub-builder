@@ -18,7 +18,8 @@
         "@types/node": "^6.0.58"
     },
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "prepare": "tsc"
     },
     "author": "Charles Mulloy",
     "license": "GPL-3.0"
