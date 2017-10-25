@@ -10,7 +10,6 @@ import { Meta } from './metadata/meta';
 import { Identifier, Title, Creator, Description, Language } from './metadata/dc';
 
 export class EpubBuilder {
-    private _uuid: string = '';
     private _bookChapters = [];
     private _assets: Asset[] = [];
     private _coverImage: Asset = null;
