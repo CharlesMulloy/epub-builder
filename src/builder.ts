@@ -3,46 +3,93 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as StringBuilder from 'string-builder';
 import * as mime from 'mime';
-import {buildChapter} from './lib/lib';
-import {Asset} from './lib/asset';
-import {Chapter} from './lib/chapter';
+import { buildChapter } from './lib/lib';
+import { Asset } from './lib/asset';
+import { Chapter } from './lib/chapter';
+import { Meta } from './metadata/meta';
+import { Identifier, Title, Creator, Description, Language } from './metadata/dc';
 
 export class EpubBuilder {
-    private _title: string = '';
-    private _author: string = '';
-    private _summary: string = '';
     private _uuid: string = '';
     private _bookChapters = [];
     private _assets: Asset[] = [];
     private _coverImage: Asset = null;
     private _currentDate = new Date().getTime();
+    private _metadata: Meta[] = [];
+
+    constructor() {
+        this.appendMeta(new Identifier(this._currentDate.toString()));
+        this.appendMeta(new Title(''));
+        this.appendMeta(new Creator(''));
+        this.appendMeta(new Description(''));
+        this.appendMeta(new Language('en'));
+    }
 
     get title() : string {
-        return this._title;
+        for (const meta of this._metadata) {
+            if (meta instanceof Title) {
+                return meta.Value;
+            }
+        }
+        return null; // The book should contains default Title
     }
 
     set title(value: string) {
-        this._title = value;
+        for (const meta of this._metadata) {
+            if (meta instanceof Title) {
+                meta.Value = value;
+                return;
+            }
+        }
     }
 
     get author(): string {
-        return this._author;
+        for (const meta of this._metadata) {
+            if (meta instanceof Creator) {
+                return meta.Value;
+            }
+        }
+        return null; // The book should contains default Creator
     }
 
     set author(value: string) {
-        this._author = value;
+        for (const meta of this._metadata) {
+            if (meta instanceof Creator) {
+                meta.Value = value;
+                return;
+            }
+        }
     }
 
     get summary(): string {
-        return this._summary;
+        for (const meta of this._metadata) {
+            if (meta instanceof Description) {
+                return meta.Value;
+            }
+        }
+        return null; // The book should contains default Description
     }
 
     set summary(value: string) {
-        this._summary = value;
+        for (const meta of this._metadata) {
+            if (meta instanceof Description) {
+                meta.Value = value;
+                return;
+            }
+        }
     }
 
     set UUID(value: string) {
-        this._uuid = value;
+        for (const meta of this._metadata) {
+            if (meta instanceof Identifier) {
+                meta.Value = value;
+                return;
+            }
+        }
+    }
+
+    public appendMeta(meta: Meta) {
+        this._metadata.push(meta);
     }
 
     public addChapter(title: string, content: string) {
@@ -128,21 +175,10 @@ export class EpubBuilder {
         sb.append(`<?xml version="1.0" encoding="UTF-8"?>`);
         sb.append(`<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookID" version="2.0">`);
         sb.append(`<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">`);
-        sb.append(`<dc:title>${this._title}</dc:title>`);
-        sb.append(`<dc:creator>${this._author}</dc:creator>`);
-        sb.append(`<dc:description>${this._summary}</dc:description>`);
-        sb.append("<dc:language>en</dc:language>");
 
-        //Generates UUID if the user did not set one.
-        if(this._uuid.length < 1 )
-            sb.append(`<dc:identifier id="BookID" opf:scheme="UUID">${this._currentDate}</dc:identifier>`);
-        //Uses the user's SSID if set.
-        else
-            sb.append(`<dc:identifier id="BookID" opf:scheme="UUID">${this._uuid}</dc:identifier>`);
-
-        const now = new Date();
-        const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-        sb.append(`<meta property="dcterms:modified">${utc.toISOString()}</meta>`);
+        for (const meta of this._metadata) {
+            sb.append(meta.toXmlComponent());
+        }
 
         //Add cover image if it is specified.
         if (this._coverImage !== null) {
@@ -180,7 +216,7 @@ export class EpubBuilder {
         sb.append(`<meta name="dtb:uid" content="${this._currentDate}"/>`);
         sb.append(`</head>`);
         sb.append(`<docTitle>`);
-        sb.append(`<text>${this._title}</text>`);
+        sb.append(`<text>${this.title}</text>`);
         sb.append(`</docTitle>`);
         sb.append(`<navMap>`);
 
