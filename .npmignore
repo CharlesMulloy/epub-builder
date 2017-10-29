@@ -3,3 +3,5 @@ node_modules
 src
 tsconfig.json
 .eslintrc.json
+testbook.epub
+testAssets

@@ -2,7 +2,8 @@
     "compilerOptions": {
         "target": "es5",
         "outDir": "dist",
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "removeComments": true
     },
     "compileOnSave": true,
     "include": ["src/**/*"]
