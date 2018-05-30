@@ -237,9 +237,9 @@ export class EpubBuilder {
         sb.append(`<navMap>`);
 
         const sections = this._assets.filter(z => z instanceof XHtmlDocument);
-        for (var i = 1; i <= sections.length; i++) {
+        for (let i = 0; i < sections.length; i++) {
             const section = sections[i] as XHtmlDocument;
-            sb.append(`<navPoint id="${section.id}" playOrder="${i}">`);
+            sb.append(`<navPoint id="${section.id}" playOrder="${i + 1}">`);
             sb.append(`<navLabel>`);
             sb.append(`<text>${section.title}</text>`);
             sb.append(`</navLabel>`);
