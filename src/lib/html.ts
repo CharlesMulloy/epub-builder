@@ -3,7 +3,7 @@ import { buildChapter } from './lib';
 
 export class XHtmlDocument extends StringAsset {
     private _html: string;
-    public title: string;
+    public title: string = '';
 
     constructor(fileName: string) {
         super(fileName, 'application/xhtml+xml');
