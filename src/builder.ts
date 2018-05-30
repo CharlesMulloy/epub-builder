@@ -4,15 +4,15 @@ import * as fs from 'fs';
 import * as StringBuilder from 'string-builder';
 import * as mime from 'mime';
 import { buildChapter } from './lib/lib';
-import { Asset } from './lib/asset';
-import { Chapter } from './lib/chapter';
+import { Asset, StringAsset, FileRefAsset, ImageFileRefAsset } from './lib/asset';
+import { XHtmlDocument } from './lib/html';
 import { Meta } from './metadata/meta';
 import { Identifier, Title, Creator, Description, Language } from './metadata/dc';
 
 export class EpubBuilder {
     private _bookChapters = [];
     private _assets: Asset[] = [];
-    private _coverImage: Asset = null;
+    private _coverImage: ImageFileRefAsset = null;
     private _currentDate = new Date().getTime();
     private _metadata: Meta[] = [];
 
@@ -92,23 +92,33 @@ export class EpubBuilder {
     }
 
     public addChapter(title: string, content: string) {
-        this._bookChapters.push(new Chapter(title, content));
+        const index = this.getChapter().length;
+        const chapter = new XHtmlDocument(`chapter-${index}.xhtml`);
+        chapter.group = 'chapter';
+        chapter.content = buildChapter(title, content);
+        this._assets.push(chapter);
     }
 
     public getChapter(chapter = -1): any {
+        const chapters = this._assets.filter(z => z instanceof XHtmlDocument);
         if (chapter === -1)
-            return this._bookChapters;
+            return chapters;
         else
-            return this._bookChapters[chapter];
+            return chapters[chapter];
     }
 
-    public addCoverImage(target: string): void {
-        this._coverImage = new Asset(target);
-        this._assets.push(this._coverImage);
+    public addCoverImage(path: string): void {
+        const asset = new ImageFileRefAsset(path);
+        this._coverImage = asset;
+        this._assets.push(asset);
     }
 
-    public addAsset(target: string): void{
-        this._assets.push(new Asset(target));
+    public addAsset(asset: Asset | string): void{
+        if (asset instanceof Asset) {
+            this._assets.push(asset);
+        } else {
+            this._assets.push(new FileRefAsset(asset));
+        }
     }
 
     public createBook(out: string) {
@@ -143,18 +153,20 @@ export class EpubBuilder {
             name: `OEBPS/toc.ncx`
         });
 
-        //Create Chapters
-        for (var i = 0; i < this._bookChapters.length; i++) {
-            archive.append(buildChapter(this._bookChapters[i].title, this._bookChapters[i].content), {
-                name: `OEBPS/Chapter${i}.html`
-            });
-        }
-
-        //Add assets
-        for (var asset of this._assets) {
-            archive.append(fs.createReadStream(asset.path), {
-                name: `OEBPS/${asset.fileName}`
-            });
+        // Add assets
+        for (const asset of this._assets) {
+            if (asset instanceof FileRefAsset) {
+                archive.append(fs.createReadStream(asset.path), {
+                    name: `OEBPS/${asset.fileName}`
+                });
+            } else if (asset instanceof StringAsset) {
+                archive.append(asset.content, {
+                    name: `OEBPS/${asset.fileName}`
+                });
+            } else {
+                // should not contains other asset.
+                throw new Error("Method not implemented.");
+            }
         }
 
         //Finalize book
@@ -162,11 +174,28 @@ export class EpubBuilder {
     }
 
     private createOPF(): string {
+        const assets = this._assets.map(z => {
+            return {
+                item: z,
+                id: null
+            };
+        });
+
+        // assign id
         const item2IdMap = {};
-        for (let i = 0; i < this._assets.length; i++) {
-            const item = this._assets[i];
-            const id = `${item.idPrefix}-${i}`;
-            item2IdMap[item.fileName] = id;
+        const groups = {};
+        for (const item of assets) {
+            if (item.item.id === null) {
+                const ls = groups[item.item.group] || [];
+                if (ls.length === 0) {
+                    groups[item.item.group] = ls;
+                }
+                item.id = `${item.item.group}-${ls.length}`;
+                ls.push(item);
+            } else {
+                item.id = item.item.id;
+            }
+            item2IdMap[item.item.fileName] = item.id;
         }
 
         var sb = new StringBuilder();
@@ -188,19 +217,17 @@ export class EpubBuilder {
         //Begin manifest
         sb.append(`<manifest>`);
         sb.append(`<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />`);
-        for (var i = 0; i < this._bookChapters.length; i++) {
-            sb.append(`<item id="Chapter${i}" href="Chapter${i}.html" media-type="application/xhtml+xml"/>`);
-        }
-        for (let i = 0; i < this._assets.length; i++) {
-            const item = this._assets[i];
-            sb.append(`<item id="${item2IdMap[item.fileName]}" href="${item.fileName}" media-type="${item.mimetype}"/>`);
+        for (const item of assets) {
+            sb.append(`<item id="${item.id}" href="${item.item.fileName}" media-type="${item.item.mimetype}"/>`);
         }
         sb.append(`</manifest>`);
 
         //Begin Spine
         sb.append(`<spine toc="ncx">`);
-        for (var i = 0; i < this._bookChapters.length; i++) {
-            sb.append(`<itemref idref="Chapter${i}"/>`);
+        for (const item of assets) {
+            if (item.item instanceof XHtmlDocument) {
+                sb.append(`<itemref idref="${item.id}"/>`);
+            }
         }
         sb.append(`</spine></package>`);
 
