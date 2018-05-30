@@ -48,7 +48,7 @@ export abstract class StringAsset extends Asset {
      * @type {string}
      * @memberof StringAsset
      */
-    abstract get content(): string;
+    abstract value(): string;
 }
 
 
