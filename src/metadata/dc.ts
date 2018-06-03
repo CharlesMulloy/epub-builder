@@ -30,3 +30,15 @@ export class Language extends StringMeta {
         return 'dc:language'
     }
 }
+
+export class Subject extends StringMeta {
+    get TagName(): string {
+        return 'dc:subject'
+    }
+}
+
+export class Publisher extends StringMeta {
+    get TagName(): string {
+        return 'dc:publisher'
+    }
+}
