@@ -5,14 +5,16 @@ import * as StringBuilder from 'string-builder';
 import * as mime from 'mime';
 import { Asset, StringAsset, FileRefAsset, ImageFileRefAsset } from './lib/asset';
 import { XHtmlDocument, Chapter } from './lib/html';
-import { Meta } from './metadata/meta';
+import { Meta, ValueMeta } from './metadata/meta';
 import { Identifier, Title, Creator, Description, Language } from './metadata/dc';
+import { TocBuilder, NavPoint } from './toc/toc-builder';
 
 export class EpubBuilder {
     private _assets: Asset[] = [];
     private _coverImage: ImageFileRefAsset = null;
     private _currentDate = new Date().getTime();
     private _metadata: Meta[] = [];
+    public TocBuilder: TocBuilder = null;
 
     constructor() {
         this.appendMeta(new Identifier(this._currentDate.toString()));
@@ -20,6 +22,14 @@ export class EpubBuilder {
         this.appendMeta(new Creator(''));
         this.appendMeta(new Description(''));
         this.appendMeta(new Language('en'));
+    }
+
+    private _getFirstMeta<T extends Meta>(constructor:{new ():T}): T {
+        for (const meta of this._metadata) {
+            if (meta instanceof constructor) {
+                return meta as T;
+            }
+        }
     }
 
     get title() : string {
@@ -83,6 +93,10 @@ export class EpubBuilder {
                 return;
             }
         }
+    }
+
+    get UUID() {
+        return this._getFirstMeta<Identifier>(Identifier).Value;
     }
 
     public appendMeta(meta: Meta) {
@@ -225,30 +239,28 @@ export class EpubBuilder {
     }
 
     private createTOC(): string {
-        var sb = new StringBuilder();
-        sb.append(`<?xml version="1.0" encoding="UTF-8"?>`);
-        sb.append(`<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">`);
-        sb.append(`<head>`);
-        sb.append(`<meta name="dtb:uid" content="${this._currentDate}"/>`);
-        sb.append(`</head>`);
-        sb.append(`<docTitle>`);
-        sb.append(`<text>${this.title}</text>`);
-        sb.append(`</docTitle>`);
-        sb.append(`<navMap>`);
 
-        const sections = this._assets.filter(z => z instanceof XHtmlDocument);
-        for (let i = 0; i < sections.length; i++) {
-            const section = sections[i] as XHtmlDocument;
-            sb.append(`<navPoint id="${section.id}" playOrder="${i + 1}">`);
-            sb.append(`<navLabel>`);
-            sb.append(`<text>${section.title}</text>`);
-            sb.append(`</navLabel>`);
-            sb.append(`<content src="${section.fileName}" />`);
-            sb.append(`</navPoint>`);
+        let tocBuilder = this.TocBuilder;
+
+        if (!tocBuilder) {
+            tocBuilder = new TocBuilder();
+            tocBuilder.UUID = this.UUID;
+            tocBuilder.Title = this.title;
+
+            this._assets
+                .filter<XHtmlDocument>((z): z is XHtmlDocument => z instanceof XHtmlDocument)
+                .map((section, i) => {
+                    const np = new NavPoint();
+                    np.Id = section.id;
+                    np.PlayOrder = i + 1;
+                    np.LabelText = section.title;
+                    np.ContentSrc = section.fileName;
+                    return np;
+                })
+                .forEach(z => tocBuilder.addNavPoint(z));
         }
-        sb.append(`</navMap></ncx>`);
 
-        return sb.toString();
+        return tocBuilder.toXmlDocument();
     }
 
     /* Deprecated */
