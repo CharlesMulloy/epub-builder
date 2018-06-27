@@ -7,6 +7,7 @@ import { Chapter, XHtmlDocument } from './lib/html';
 import { Creator, Description, Identifier, Language, Title } from './metadata/dc';
 import { Meta } from './metadata/meta';
 import { NavPoint, TocBuilder } from './toc/toc-builder';
+import xmlescape = require('xml-escape');
 
 export class EpubBuilder {
     private _assets: Asset[] = [];
@@ -213,7 +214,7 @@ export class EpubBuilder {
 
         //Add cover image if it is specified.
         if (this._coverImage !== null) {
-            sb.append(`<meta name="cover" content="${this._coverImage.id}"/>`);
+            sb.append(`<meta name="cover" content="${xmlescape(this._coverImage.id)}"/>`);
         }
         sb.append(`</metadata>`);
 
@@ -221,7 +222,7 @@ export class EpubBuilder {
         sb.append(`<manifest>`);
         sb.append(`<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />`);
         for (const asset of this._assets) {
-            sb.append(`<item id="${asset.id}" href="${asset.fileName}" media-type="${asset.mimetype}"/>`);
+            sb.append(`<item id="${xmlescape(asset.id)}" href="${xmlescape(asset.fileName)}" media-type="${xmlescape(asset.mimetype)}"/>`);
         }
         sb.append(`</manifest>`);
 
@@ -229,7 +230,7 @@ export class EpubBuilder {
         sb.append(`<spine toc="ncx">`);
         for (const asset of this._assets) {
             if (asset instanceof XHtmlDocument) {
-                sb.append(`<itemref idref="${asset.id}"/>`);
+                sb.append(`<itemref idref="${xmlescape(asset.id)}"/>`);
             }
         }
         sb.append(`</spine></package>`);

@@ -1,8 +1,6 @@
 import xmlescape = require('xml-escape');
 import * as StringBuilder from 'string-builder';
 
-import { XHtmlDocument } from '../lib/html';
-
 let INC_ID = 0;
 
 export class NavPoint {
@@ -51,10 +49,10 @@ export class TocBuilder {
         sb.append(`<?xml version="1.0" encoding="UTF-8"?>`);
         sb.append(`<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">`);
         sb.append(`<head>`);
-        sb.append(`<meta name="dtb:uid" content="${uuid}"/>`);
+        sb.append(`<meta name="dtb:uid" content="${xmlescape(uuid)}"/>`);
         sb.append(`</head>`);
         sb.append(`<docTitle>`);
-        sb.append(`<text>${title}</text>`);
+        sb.append(`<text>${xmlescape(title)}</text>`);
         sb.append(`</docTitle>`);
         sb.append(`<navMap>`);
 
