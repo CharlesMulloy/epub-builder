@@ -47,7 +47,6 @@ export class Chapter extends XHtmlDocument {
 
     set content(value: string) {
         this._content = value;
-        this.html = buildChapter(this.title, value);
     }
 
     get html(): string {
