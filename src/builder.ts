@@ -1,13 +1,12 @@
 import * as archiver from 'archiver';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as StringBuilder from 'string-builder';
-import * as mime from 'mime';
-import { Asset, StringAsset, FileRefAsset, ImageFileRefAsset } from './lib/asset';
-import { XHtmlDocument, Chapter } from './lib/html';
-import { Meta, ValueMeta } from './metadata/meta';
-import { Identifier, Title, Creator, Description, Language } from './metadata/dc';
-import { TocBuilder, NavPoint } from './toc/toc-builder';
+import { Asset, FileRefAsset, ImageFileRefAsset, TextAsset } from './lib/asset';
+import { Chapter, XHtmlDocument } from './lib/html';
+import { Creator, Description, Identifier, Language, Title } from './metadata/dc';
+import { Meta } from './metadata/meta';
+import { NavPoint, TocBuilder } from './toc/toc-builder';
 
 export class EpubBuilder {
     private _assets: Asset[] = [];
@@ -173,7 +172,7 @@ export class EpubBuilder {
                 archive.append(fs.createReadStream(asset.path), {
                     name: `OEBPS/${asset.fileName}`
                 });
-            } else if (asset instanceof StringAsset) {
+            } else if (asset instanceof TextAsset) {
                 archive.append(asset.value(), {
                     name: `OEBPS/${asset.fileName}`
                 });

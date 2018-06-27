@@ -1,7 +1,7 @@
-import { StringAsset } from './asset';
+import { TextAsset } from './asset';
 import { buildChapter } from './lib';
 
-export class XHtmlDocument extends StringAsset {
+export class XHtmlDocument extends TextAsset {
     private _html: string;
     public title: string = '';
 
@@ -59,7 +59,7 @@ export class Chapter extends XHtmlDocument {
     }
 }
 
-export class CSSDocument extends StringAsset {
+export class CSSDocument extends TextAsset {
     public content: string;
 
     constructor(fileName: string) {
