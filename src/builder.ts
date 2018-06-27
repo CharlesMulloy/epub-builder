@@ -173,7 +173,7 @@ export class EpubBuilder {
                     name: `OEBPS/${asset.fileName}`
                 });
             } else if (asset instanceof TextAsset) {
-                archive.append(asset.value(), {
+                archive.append(asset.getTextDocument(), {
                     name: `OEBPS/${asset.fileName}`
                 });
             } else {

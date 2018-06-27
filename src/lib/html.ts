@@ -10,7 +10,7 @@ export class XHtmlDocument extends TextAsset {
         this.group = 'section';
     }
 
-    value() : string {
+    getTextDocument() : string {
         return this._html;
     }
 
@@ -37,7 +37,7 @@ export class Chapter extends XHtmlDocument {
         this.group = 'chapter';
     }
 
-    value() : string {
+    getTextDocument() : string {
         return buildChapter(this.title, this._content);
     }
 
@@ -73,7 +73,7 @@ export class CSSDocument extends TextAsset {
      * @type {string}
      * @memberof XHtmlDocument
      */
-    value(): string {
+    getTextDocument(): string {
         return this.content;;
     }
 }

@@ -48,7 +48,7 @@ export abstract class TextAsset extends Asset {
      * @type {string}
      * @memberof TextAsset
      */
-    abstract value(): string;
+    abstract getTextDocument(): string;
 }
 
 
