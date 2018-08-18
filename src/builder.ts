@@ -1,18 +1,20 @@
 import * as archiver from 'archiver';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
 import * as StringBuilder from 'string-builder';
-import * as mime from 'mime';
-import { Asset, StringAsset, FileRefAsset, ImageFileRefAsset } from './lib/asset';
-import { XHtmlDocument, Chapter } from './lib/html';
+import { Asset, FileRefAsset, ImageFileRefAsset, TextAsset } from './lib/asset';
+import { Chapter, XHtmlDocument } from './lib/html';
+import { Creator, Description, Identifier, Language, Title } from './metadata/dc';
 import { Meta } from './metadata/meta';
-import { Identifier, Title, Creator, Description, Language } from './metadata/dc';
+import { NavPoint, TocBuilder } from './toc/toc-builder';
+import xmlescape = require('xml-escape');
 
 export class EpubBuilder {
     private _assets: Asset[] = [];
     private _coverImage: ImageFileRefAsset = null;
     private _currentDate = new Date().getTime();
     private _metadata: Meta[] = [];
+    public TocBuilder: TocBuilder = null;
 
     constructor() {
         this.appendMeta(new Identifier(this._currentDate.toString()));
@@ -20,6 +22,14 @@ export class EpubBuilder {
         this.appendMeta(new Creator(''));
         this.appendMeta(new Description(''));
         this.appendMeta(new Language('en'));
+    }
+
+    private _getFirstMeta<T extends Meta>(constructor:{new ():T}): T {
+        for (const meta of this._metadata) {
+            if (meta instanceof constructor) {
+                return meta as T;
+            }
+        }
     }
 
     get title() : string {
@@ -83,6 +93,10 @@ export class EpubBuilder {
                 return;
             }
         }
+    }
+
+    get UUID() {
+        return this._getFirstMeta<Identifier>(Identifier).Value;
     }
 
     public appendMeta(meta: Meta) {
@@ -159,8 +173,8 @@ export class EpubBuilder {
                 archive.append(fs.createReadStream(asset.path), {
                     name: `OEBPS/${asset.fileName}`
                 });
-            } else if (asset instanceof StringAsset) {
-                archive.append(asset.value(), {
+            } else if (asset instanceof TextAsset) {
+                archive.append(asset.getTextDocument(), {
                     name: `OEBPS/${asset.fileName}`
                 });
             } else {
@@ -200,7 +214,7 @@ export class EpubBuilder {
 
         //Add cover image if it is specified.
         if (this._coverImage !== null) {
-            sb.append(`<meta name="cover" content="${this._coverImage.id}"/>`);
+            sb.append(`<meta name="cover" content="${xmlescape(this._coverImage.id)}"/>`);
         }
         sb.append(`</metadata>`);
 
@@ -208,7 +222,7 @@ export class EpubBuilder {
         sb.append(`<manifest>`);
         sb.append(`<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml" />`);
         for (const asset of this._assets) {
-            sb.append(`<item id="${asset.id}" href="${asset.fileName}" media-type="${asset.mimetype}"/>`);
+            sb.append(`<item id="${xmlescape(asset.id)}" href="${xmlescape(asset.fileName)}" media-type="${xmlescape(asset.mimetype)}"/>`);
         }
         sb.append(`</manifest>`);
 
@@ -216,7 +230,7 @@ export class EpubBuilder {
         sb.append(`<spine toc="ncx">`);
         for (const asset of this._assets) {
             if (asset instanceof XHtmlDocument) {
-                sb.append(`<itemref idref="${asset.id}"/>`);
+                sb.append(`<itemref idref="${xmlescape(asset.id)}"/>`);
             }
         }
         sb.append(`</spine></package>`);
@@ -225,30 +239,28 @@ export class EpubBuilder {
     }
 
     private createTOC(): string {
-        var sb = new StringBuilder();
-        sb.append(`<?xml version="1.0" encoding="UTF-8"?>`);
-        sb.append(`<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">`);
-        sb.append(`<head>`);
-        sb.append(`<meta name="dtb:uid" content="${this._currentDate}"/>`);
-        sb.append(`</head>`);
-        sb.append(`<docTitle>`);
-        sb.append(`<text>${this.title}</text>`);
-        sb.append(`</docTitle>`);
-        sb.append(`<navMap>`);
 
-        const sections = this._assets.filter(z => z instanceof XHtmlDocument);
-        for (let i = 0; i < sections.length; i++) {
-            const section = sections[i] as XHtmlDocument;
-            sb.append(`<navPoint id="${section.id}" playOrder="${i + 1}">`);
-            sb.append(`<navLabel>`);
-            sb.append(`<text>${section.title}</text>`);
-            sb.append(`</navLabel>`);
-            sb.append(`<content src="${section.fileName}" />`);
-            sb.append(`</navPoint>`);
+        let tocBuilder = this.TocBuilder;
+
+        if (!tocBuilder) {
+            tocBuilder = new TocBuilder();
+            tocBuilder.UUID = this.UUID;
+            tocBuilder.Title = this.title;
+
+            this._assets
+                .filter<XHtmlDocument>((z): z is XHtmlDocument => z instanceof XHtmlDocument)
+                .map((section, i) => {
+                    const np = new NavPoint();
+                    np.Id = section.id;
+                    np.PlayOrder = i + 1;
+                    np.LabelText = section.title;
+                    np.ContentSrc = section.fileName;
+                    return np;
+                })
+                .forEach(z => tocBuilder.addNavPoint(z));
         }
-        sb.append(`</navMap></ncx>`);
 
-        return sb.toString();
+        return tocBuilder.toXmlDocument();
     }
 
     /* Deprecated */

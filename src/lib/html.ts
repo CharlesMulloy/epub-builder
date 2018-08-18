@@ -1,16 +1,16 @@
-import { StringAsset } from './asset';
+import { TextAsset } from './asset';
 import { buildChapter } from './lib';
 
-export class XHtmlDocument extends StringAsset {
+export class XHtmlDocument extends TextAsset {
     private _html: string;
-    public title: string;
+    public title: string = '';
 
     constructor(fileName: string) {
         super(fileName, 'application/xhtml+xml');
         this.group = 'section';
     }
 
-    value() : string {
+    getTextDocument() : string {
         return this._html;
     }
 
@@ -37,7 +37,7 @@ export class Chapter extends XHtmlDocument {
         this.group = 'chapter';
     }
 
-    value() : string {
+    getTextDocument() : string {
         return buildChapter(this.title, this._content);
     }
 
@@ -47,7 +47,6 @@ export class Chapter extends XHtmlDocument {
 
     set content(value: string) {
         this._content = value;
-        this.html = buildChapter(this.title, value);
     }
 
     get html(): string {
@@ -59,7 +58,7 @@ export class Chapter extends XHtmlDocument {
     }
 }
 
-export class CSSDocument extends StringAsset {
+export class CSSDocument extends TextAsset {
     public content: string;
 
     constructor(fileName: string) {
@@ -73,7 +72,7 @@ export class CSSDocument extends StringAsset {
      * @type {string}
      * @memberof XHtmlDocument
      */
-    value(): string {
+    getTextDocument(): string {
         return this.content;;
     }
 }

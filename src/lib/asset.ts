@@ -1,8 +1,8 @@
 //Used to get the mimetype from the asset.
-import {lookup} from 'mime';
-
+import { lookup } from 'mime';
 //Used to get the file name of the asset
-import {basename} from 'path';
+import { basename } from 'path';
+
 
 export class Asset {
     private _fileName: string;
@@ -39,16 +39,16 @@ export class Asset {
     }
 }
 
-export abstract class StringAsset extends Asset {
+export abstract class TextAsset extends Asset {
     /**
      * The asset value which should store into epub file.
      *
      * @readonly
      * @abstract
      * @type {string}
-     * @memberof StringAsset
+     * @memberof TextAsset
      */
-    abstract value(): string;
+    abstract getTextDocument(): string;
 }
 
 
