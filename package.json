@@ -21,7 +21,7 @@
     "mocha": "^4.0.1"
   },
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha dist && epubcheck testbook.epub",
+    "test": "tsc && ./node_modules/mocha/bin/mocha dist && epubcheck testbook.epub",
     "prepare": "tsc"
   },
   "author": "Charles Mulloy",
