@@ -134,7 +134,7 @@ export class EpubBuilder {
     }
 
     public createBook(out: string) {
-        var outputFolder = path.join(process.cwd(), out + ".epub");
+        var outputFolder = path.join(process.cwd(), out);
         var output = fs.createWriteStream(outputFolder);
         var archive = archiver('zip', {
             store: true

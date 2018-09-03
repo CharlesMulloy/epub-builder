@@ -38,7 +38,7 @@ describe("EpubBuilder", function() {
       ebook.title = "Title"
       ebook.addChapter("Chapter 1", `<p><img src="images/image.jpeg" alt="Test image"/></p>`);
       ebook.addAsset("./src/testAssets/image.jpeg", "images/image.jpeg");
-      ebook.createBook("testbook");
+      ebook.createBook("testbook.epub");
     });
 
   });
