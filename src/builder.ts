@@ -125,11 +125,11 @@ export class EpubBuilder {
         this._assets.push(asset);
     }
 
-    public addAsset(asset: Asset | string): void{
+    public addAsset(asset: Asset | string, fileName: string = null): void{
         if (asset instanceof Asset) {
             this._assets.push(asset);
         } else {
-            this._assets.push(new FileRefAsset(asset));
+            this._assets.push(new FileRefAsset(asset, fileName));
         }
     }
 

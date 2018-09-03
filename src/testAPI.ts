@@ -33,5 +33,13 @@ describe("EpubBuilder", function() {
       ebook.createBook("testbook");
     });
 
+
+    // it("Should allow the addition of assets in other folders", function() {
+    //   ebook.title = "Title"
+    //   ebook.addChapter("Chapter 1", `<p><img src="images/image.jpeg" alt="Test image"/></p>`);
+    //   ebook.addAsset("./src/testAssets/image.jpeg", "images/image.jpeg");
+    //   ebook.createBook("testbook");
+    // });
+
   });
 });
