@@ -6,7 +6,8 @@ This library is designed to facilitate the creation of EPUB files as easily as p
 To create a book you only need to follow this simple formula.
 
 ``` js
-var book = require("epub-builder");
+var EbookBuilder = require("epub-builder");
+var book = new EbookBuilder();
 book.title = "This is a title";
 book.author = "This is the author";
 book.summary = "This is the summary";
@@ -17,17 +18,24 @@ book.addChapter("Chapter Title", "Chapter Content");
 // Used to add a cover image to the book.
 book.addCoverImage("path/to/image.png");
 // Use the following method to add assets to the epub, such as stylesheets or images.
-// Make sure that the content of the chapters assume that the assets are parallel to themselves and not in any other folder.
-book.addAsset("path/to/asset");
+// Add a second argument if you want it to change the filename/location in the file.
+book.addAsset("path/to/asset", "images/image.jpg");
 // Do not add .epub to the title. That is done automatically.
 book.createBook("TestBook");
 
 // To create a new book, try:
-var newbook = new (require("epub-builder").constructor);
+var newbook = new EbookBuilder();
 ```
 
 Version history
 ---------------
+
+1.3.4
+- Created build script for VS Code.
+- Can now specify the path that assets are saved to with .addAsset();
+- Builder no longer automatically appends ".epub" to the end of the output file names.
+- Can now create multiple builders with "new EbookBuilder()".
+
 1.2.5
 - Fixed version typo in README.md
 
@@ -46,5 +54,4 @@ Version history
 
 Todo list
 ---------
-- Will deprecate createBook() and replace with another method so that the output filename can have any extension desired. File will still be an Epub file though.
-- Set to automatically prettify text.
+- Fix tests to cover every feature of the project.

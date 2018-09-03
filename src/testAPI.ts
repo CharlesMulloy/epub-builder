@@ -2,10 +2,17 @@ var assert = require('assert');
 
 describe("EpubBuilder", function() {
   describe("API functionality", function() {
-    let ebook = require('./index');
-    it("Should create the book object", function() {
-      assert.notEqual(ebook === null);
-    })
+    let ebookModule = require('./index');
+    const ebook = new ebookModule();
+    const ebook2 = new ebookModule();
+    ebook.title = "Tale of Two Cities"
+    ebook2.title = "Tom Sawer"
+    console.log(ebook.title, ebook2.title);
+
+
+    // it("Should create the book object", function() {
+    //   assert.notEqual(ebook === null);
+    // })
 
     // it("Should allow the setting of the books' properies", function() {
     //   ebook.title = "This is a title";
@@ -34,12 +41,12 @@ describe("EpubBuilder", function() {
     // });
 
 
-    it("Should allow the addition of assets in other folders", function() {
-      ebook.title = "Title"
-      ebook.addChapter("Chapter 1", `<p><img src="images/image.jpeg" alt="Test image"/></p>`);
-      ebook.addAsset("./src/testAssets/image.jpeg", "images/image.jpeg");
-      ebook.createBook("testbook.epub");
-    });
+    // it("Should allow the addition of assets in other folders", function() {
+    //   ebook.title = "Title"
+    //   ebook.addChapter("Chapter 1", `<p><img src="images/image.jpeg" alt="Test image"/></p>`);
+    //   ebook.addAsset("./src/testAssets/image.jpeg", "images/image.jpeg");
+    //   ebook.createBook("testbook.epub");
+    // });
 
   });
 });
